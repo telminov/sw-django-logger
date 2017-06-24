@@ -28,7 +28,7 @@ class DbHandler(Handler):
         if hasattr(record, 'object'):
             log.object_id = record.object.id
             log.object_name = record.object.LOG_NAME
-            log.object_data = tools.model_to_dict(record.object)
+            log.object_data = json.dumps(tools.model_to_dict(record.object))
 
         if hasattr(record, 'object_name'):
             log.object_name = record.object_name

@@ -1,6 +1,7 @@
 import json
 from typing import Optional
 from django.db import models
+from django.contrib.auth.models import User
 from . import consts
 
 
@@ -27,7 +28,7 @@ class Log(models.Model):
     object_data = models.TextField(blank=True)
 
     extra = models.TextField(blank=True)
-    dc = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def get_model_object(self) -> models.Model:
         from . import tools
@@ -39,6 +40,9 @@ class Log(models.Model):
 
     def get_object_model_name(self) -> str:
         model_object = self.get_model_object()
+        if not model_object:
+            return
+
         name = model_object._meta.verbose_name
         return name
 
@@ -48,4 +52,8 @@ class Log(models.Model):
 
         return json.loads(self.object_data)
 
+    def get_user(self):
+        if not self.user_id:
+            return
 
+        return User.objects.get(id=self.user_id)

@@ -14,6 +14,6 @@ setup(
     license='The MIT License',
     test_suite='runtests.runtests',
     install_requires=[
-        'django',
+        'django', 'django-filter',
     ],
 )

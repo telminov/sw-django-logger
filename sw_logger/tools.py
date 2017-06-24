@@ -29,6 +29,13 @@ def get_model_by_log_name(log_name) -> Type[Model]:
     raise LoggerException('Model with LOG_NAME "%s" not found' % log_name)
 
 
+def get_models_choices() -> List:
+    choices = []
+    for model in get_models():
+        choices.append((model.LOG_NAME, model._meta.verbose_name))
+    return choices
+
+
 def object_from_log(log: models.Log) -> Optional[Model]:
     """
         create model object in memory from log data
