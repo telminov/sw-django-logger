@@ -1,18 +1,23 @@
-from logging import Handler, LogRecord
+from typing import Type
 import json
+from logging import Handler, LogRecord
 from django.http import QueryDict
+from django.db.models import Model
 
 
 class DbHandler(Handler):
+    @staticmethod
+    def get_log_model() -> Type[Model]:
+        from . import models
+        return models.Log
 
     def emit(self, record: LogRecord):
         # internal import for prevent circular import
-        from . import models
         from . import tools
 
         func_name = '%s.%s; line %s' % (record.module, record.funcName, record.lineno)
 
-        log = models.Log(
+        log = self.get_log_model()(
             message=record.msg,
             func_name=func_name,
             level=record.levelname,
@@ -37,11 +42,11 @@ class DbHandler(Handler):
         if hasattr(record, 'extra'):
             log.extra = json.dumps(record.extra)
 
-        self._emit_extra(record, log)
+        self._emit_extra(log, record)
 
         log.save()
 
-    def _emit_extra(self, record, log_object):
+    def _emit_extra(self, log, record: LogRecord):
         """
             Extension point. For example, for processing additional fields.
         """
