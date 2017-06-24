@@ -13,18 +13,20 @@ class Log(models.Model):
     func_name = models.CharField(max_length=255)
     level = models.CharField(max_length=10, choices=LOG_LEVEL_CHOICES, default='NOTSET')
 
-    http_general = models.TextField()
-    http_request_get = models.TextField()
-    http_request_post = models.TextField()
+    http_path = models.TextField(blank=True)
+    http_method = models.TextField(blank=True)
+    http_request_get = models.TextField(blank=True)
+    http_request_post = models.TextField(blank=True)
+    http_referrer = models.CharField(max_length=255, blank=True)
 
-    user_id = models.IntegerField(db_index=True)
-    username = models.CharField(max_length=255, db_index=True)
+    user_id = models.IntegerField(db_index=True, null=True)
+    username = models.CharField(max_length=255, db_index=True, blank=True)
 
-    object_name = models.CharField(max_length=255, db_index=True)
-    object_id = models.IntegerField(db_index=True)
-    object_data = models.TextField()
+    object_name = models.CharField(max_length=255, db_index=True, blank=True)
+    object_id = models.IntegerField(db_index=True, null=True)
+    object_data = models.TextField(blank=True)
 
-    extra = models.TextField()
+    extra = models.TextField(blank=True)
     dc = models.DateTimeField(auto_now_add=True)
 
     def get_model_object(self) -> models.Model:

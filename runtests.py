@@ -14,7 +14,7 @@ def runtests():
     django.setup()
     TestRunner = get_runner(settings)
     test_runner = TestRunner(verbosity=1, interactive=True)
-    failures = test_runner.run_tests(['swlogger'])
+    failures = test_runner.run_tests(['sw_logger'])
     sys.exit(bool(failures))
 
 

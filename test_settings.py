@@ -1,4 +1,4 @@
-ROOT_URLCONF = 'swlogger.urls'
+ROOT_URLCONF = 'sw_logger.urls'
 
 DATABASES = {
     'default': {
@@ -23,7 +23,7 @@ TEMPLATE_CONTEXT_PROCESSORS = [
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'swlogger',
+    'sw_logger',
 ]
 
 SECRET_KEY = "123"

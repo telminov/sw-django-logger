@@ -9,6 +9,6 @@ install:
   - pip install -r requirements.txt
   - pip install coveralls
 script:
-  - coverage run --source=swlogger setup.py test
+  - coverage run --source=sw_logger setup.py test
 after_success:
   - coveralls
