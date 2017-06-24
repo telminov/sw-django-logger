@@ -30,6 +30,9 @@ class Log(models.Model):
     extra = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ('id', )
+
     def get_model_object(self) -> models.Model:
         from . import tools
 
@@ -38,7 +41,7 @@ class Log(models.Model):
 
         return self._got_model_object
 
-    def get_object_model_name(self) -> str:
+    def get_object_model_name(self) -> Optional[str]:
         model_object = self.get_model_object()
         if not model_object:
             return
@@ -52,8 +55,36 @@ class Log(models.Model):
 
         return json.loads(self.object_data)
 
+    def get_object_data_display(self) -> Optional[dict]:
+        from . import tools
+        return tools.object_display_from_log(self)
+
     def get_user(self):
         if not self.user_id:
             return
 
         return User.objects.get(id=self.user_id)
+
+    def get_previous_object_log(self) -> Optional['Log']:
+        """
+        :return: previous log record for same object (same object_name and object_id)
+        """
+        if not self.object_data:
+            return
+
+        previous_qs = Log.objects.filter(
+            id__lt=self.id,
+            object_name=self.object_name,
+            object_id=self.object_id,
+        )
+        if previous_qs:
+            return previous_qs.last()
+
+    def get_changes(self) -> Optional[dict]:
+        from . import tools
+
+        previous_object_log = self.get_previous_object_log()
+        if not previous_object_log:
+            return self.get_object_data_display()
+
+        return tools.get_changes_display(previous_object_log, self)

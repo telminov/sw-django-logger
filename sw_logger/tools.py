@@ -1,6 +1,7 @@
+from collections import OrderedDict
 from typing import List, Type, Optional
 import datetime
-from django.db.models import Model, ForeignKey
+from django.db.models import Model, ForeignKey, UUIDField
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import ValuesListIterable, QuerySet
 from django.apps import apps
@@ -73,9 +74,70 @@ def object_from_log(log: models.Log) -> Optional[Model]:
     return model_object
 
 
+def object_display_from_log(log: models.Log) -> Optional[dict]:
+    """
+    :param log:
+    :return: human oriented object data representation (use verbose names and etc)
+    """
+    if not log.object_data:
+        return
+
+    display_data = OrderedDict()
+    object_data = log.get_object_data()
+    model = get_model_by_log_name(log.object_name)
+
+    for field in model._meta.fields:
+        value = object_data.get(field.name)
+
+        if isinstance(field, ForeignKey):
+            filter_params = {}
+            filter_params[field.rel.field_name] = value
+            related_qs = field.rel.to.objects.filter(**filter_params)
+            if len(related_qs):
+                value = related_qs[0]
+
+        if isinstance(value, list):
+            value = ', '.join(value)
+
+        display_data[field.verbose_name] = value
+
+    for field in model._meta.many_to_many:
+        value = object_data.get(field.name)
+        related_qs = field.related_model.objects.filter(pk__in=value)
+        display_data[field.verbose_name] = ', '.join(sorted([str(i) for i in related_qs]))
+
+    return display_data
+
+
+def get_changes_display(previous_log: models.Log, current_log: models.Log) -> Optional[dict]:
+    """
+    :param previous_log:
+    :param current_log:
+    :return: human oriented representation of differences between objects data two of log records
+    """
+    previous_display = previous_log.get_object_data_display()
+    current_display = current_log.get_object_data_display()
+
+    if not previous_display or not current_display:
+        return
+
+    changes_display = OrderedDict()
+    for field_name in current_display.keys():
+        if current_display[field_name] != previous_display.get(field_name):
+            changes_display[field_name] = current_display[field_name]
+
+    return changes_display
+
+
 def model_to_dict(obj: Model) -> dict:
     obj_dict = django.forms.model_to_dict(obj)
     obj_dict = _converter(obj_dict)
+
+    # model_to_dict from django.forms skip some fields... Add it.
+    for field in obj._meta.fields:
+        if isinstance(field, UUIDField):
+            obj_dict[field.name] = str(getattr(obj, field.name))
+
     return obj_dict
 
 
