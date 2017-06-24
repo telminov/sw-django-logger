@@ -1,0 +1,14 @@
+language: python
+python:
+  - "3.5"
+  - "3.6"
+env:
+  - DJANGO=1.10
+  - DJANGO=1.11
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+script:
+  - coverage run --source=swlogger setup.py test
+after_success:
+  - coveralls

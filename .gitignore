@@ -1,0 +1,8 @@
+.idea
+MANIFEST
+build/
+dist/
+venv
+.coverage
+.eggs
+sw_django_logger.egg-info
