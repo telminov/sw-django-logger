@@ -1,7 +1,10 @@
 from typing import List, Type, Optional
-
+import datetime
 from django.db.models import Model, ForeignKey
+from django.db.models.fields.files import FieldFile
+from django.db.models.query import ValuesListIterable, QuerySet
 from django.apps import apps
+import django.forms
 from . import LoggerException
 from . import models
 
@@ -61,3 +64,32 @@ def object_from_log(log: models.Log) -> Optional[Model]:
         setattr(model_object, field_name, value)
 
     return model_object
+
+
+def model_to_dict(obj: Model) -> dict:
+    obj_dict = django.forms.model_to_dict(obj)
+    obj_dict = _converter(obj_dict)
+    return obj_dict
+
+
+def _converter(obj_dict: dict) -> dict:
+    for key, value in obj_dict.items():
+        if isinstance(value, dict):
+            obj_dict[key] = _converter(value)
+
+        elif isinstance(value, FieldFile):
+            obj_dict[key] = str(value)
+
+        elif isinstance(value, datetime.date):
+            obj_dict[key] = value.isoformat()
+
+        elif isinstance(value, datetime.datetime):
+            obj_dict[key] = value.isoformat(sep=' ')
+
+        elif isinstance(value, ValuesListIterable):
+            obj_dict[key] = list(value)
+
+        elif isinstance(value, QuerySet):
+            obj_dict[key] = list(value.values_list('pk', flat=True))
+
+    return obj_dict

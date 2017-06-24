@@ -1,12 +1,14 @@
 from logging import Handler, LogRecord
 import json
-from django.http import QueryDict, HttpRequest
+from django.http import QueryDict
 
 
 class DbHandler(Handler):
 
     def emit(self, record: LogRecord):
-        from . import models    # internal import for prevent circular import
+        # internal import for prevent circular import
+        from . import models
+        from . import tools
 
         func_name = '%s.%s; line %s' % (record.module, record.funcName, record.lineno)
 
@@ -17,6 +19,11 @@ class DbHandler(Handler):
         )
 
         self._process_request_data(log, record)
+
+        if hasattr(record, 'object'):
+            log.object_id = record.object.id
+            log.object_name = record.object.LOG_NAME
+            log.object_data = tools.model_to_dict(record.object)
 
         if hasattr(record, 'object_name'):
             log.object_name = record.object_name
@@ -62,7 +69,6 @@ class DbHandler(Handler):
         if getattr(request, 'user', None):
             log.user_id = getattr(request.user, 'id', None)
             log.username = getattr(request.user, 'username', None)
-
 
     @classmethod
     def _query_to_dict(cls, params: QueryDict) -> dict:
