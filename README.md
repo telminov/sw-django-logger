@@ -136,4 +136,96 @@ Add template
         </tr>
     {% endfor %}
     </tbody>
+</table>
+```
+
+## Customizing log model
+Add additional fields (for example, "client")
+```python
+import sw_logger.models
+
+class Log(sw_logger.models.Log):
+    client = models.ForeignKey(Client, db_index=True, null=True)
+```
+
+## Customizing log handler
+Create customize handler (for example, for automatical filling client-field in log model)
+```python
+from sw_logger.handlers import DbHandler as BaseDbHandler
+
+class DbHandler(BaseDbHandler):
+    @staticmethod
+    def get_log_model():
+        from core import models
+        return models.Log
+
+    def _emit_extra(self, log, record):
+        from core import models
+        
+        if not hasattr(record, 'object'):
+            return
+
+        if hasattr(record, 'client'):
+            log.client = record.object
+        elif isinstance(record.object, models.Client):
+            log.client = record.object
+        elif hasattr(record.object, 'client') and isinstance(record.object.client, models.Client):
+            log.client = record.object.client
+```
+Add handler in settings
+```python
+LOGGING = {
+    ...
+    'handlers': {
+        'db': {
+            'level': 'INFO',
+            'class': 'core.handlers.DbHandler',
+        },
+    },
+    'loggers': {
+        'db': {
+            'handlers': ['db'],
+            'level': 'INFO',
+        }
+    }
+}
+```
+Migrations
+```
+./manage.py makemigrations core
+./manage.py migrate core
+```
+
+## Customizing log view
+Form
+```python
+import sw_logger.forms
+
+class Log(sw_logger.forms.Log):
+    client = forms.ModelChoicesField(...)
+```
+
+Filters
+```python
+from core import models
+import sw_logger.filters
+
+class Log(sw_logger.filters.Log):
+    class Meta:
+        model = models.Log
+        fields = sw_logger.filters.Log.Meta.fields + ['client']
+```
+
+View
+```python
+from core import forms
+from core import models
+from core import filters
+import sw_logger.views
+
+class Log(sw_logger.views.Log):
+    template_name = 'core/report/log.html'
+    form_class = forms.Log
+    model = models.Log
+    filter_class = filters.Log
 ```
