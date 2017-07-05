@@ -34,5 +34,28 @@ LOGGING = {
     }
 }
 ```
+Migrate
+```
+./manage.py migrate
+```
 
 ## Logging
+Using in view:
+```python
+import logging
+logger = logging.getLogger('db')
+
+class Update(UpdateView):
+   ...
+   def form_valid(self, form):
+       response = super().form_valid(form)
+       
+       logger_db.info(
+            'Some message',
+            extra={
+                'action': sw_logger.consts.ACTION_UPDATED,
+                'request': self.request,
+                'object': self.get_object(),
+            }
+        )
+```
