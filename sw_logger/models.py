@@ -1,8 +1,10 @@
 import json
 from typing import Optional
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from . import consts
+
+User = get_user_model()
 
 
 class Log(models.Model):
