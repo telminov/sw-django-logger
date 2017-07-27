@@ -1,11 +1,14 @@
+import django.forms
+import datetime
+import decimal
+
 from collections import OrderedDict
 from typing import List, Type, Optional
-import datetime
 from django.db.models import Model, ForeignKey, UUIDField
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import ValuesListIterable, QuerySet
 from django.apps import apps
-import django.forms
+
 from . import LoggerException
 from . import models
 
@@ -160,5 +163,11 @@ def _converter(obj_dict: dict) -> dict:
 
         elif isinstance(value, QuerySet):
             obj_dict[key] = list(value.values_list('pk', flat=True))
+
+        elif isinstance(value, bytes):
+            obj_dict[key] = value.decode('utf-8')
+
+        elif isinstance(value, decimal.Decimal):
+            obj_dict[key] = [str(i) for i in [value]]
 
     return obj_dict
