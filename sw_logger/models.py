@@ -4,8 +4,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from . import consts
 
-User = get_user_model()
-
 
 class Log(models.Model):
     ACTION_CHOICES = [('', '')] + list(consts.ACTION_CHOICES)
@@ -65,6 +63,7 @@ class Log(models.Model):
         if not self.user_id:
             return
 
+        User = get_user_model()
         return User.objects.get(id=self.user_id)
 
     def get_previous_object_log(self) -> Optional['Log']:
