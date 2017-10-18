@@ -4,7 +4,7 @@ import decimal
 
 from collections import OrderedDict
 from typing import List, Type, Optional
-from django.db.models import Model, ForeignKey, UUIDField
+from django.db.models import Model, ForeignKey, UUIDField, ManyToManyField
 from django.db.models.fields.files import FieldFile
 from django.db.models.query import ValuesListIterable, QuerySet
 from django.apps import apps
@@ -140,6 +140,17 @@ def model_to_dict(obj: Model) -> dict:
     for field in obj._meta.fields:
         if isinstance(field, UUIDField):
             obj_dict[field.name] = str(getattr(obj, field.name))
+
+    # replace m2m object instance by pk
+    for field_name, value in obj_dict.items():
+        if isinstance(value, list):
+            new_value = []
+            for item in value:
+                if isinstance(item, Model):
+                    new_value.append(item.pk)
+                else:
+                    new_value.append(item)
+            obj_dict[field_name] = new_value
 
     return obj_dict
 
