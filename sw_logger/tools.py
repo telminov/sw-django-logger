@@ -166,6 +166,9 @@ def _converter(obj_dict: dict) -> dict:
         elif isinstance(value, datetime.date):
             obj_dict[key] = value.isoformat()
 
+        elif isinstance(value, datetime.time):
+            obj_dict[key] = value.isoformat()
+
         elif isinstance(value, datetime.datetime):
             obj_dict[key] = value.isoformat(sep=' ')
 
