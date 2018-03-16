@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from . import models
 from . import forms
 from . import filters
+from . import consts
 
 
 class Log(TemplateView):
@@ -19,6 +20,13 @@ class Log(TemplateView):
         qs = self.get_queryset()
         context['page'] = self._get_page(qs)
         context['object_list'] = qs
+
+        context['LOG_LEVEL_CRITICAL'] = consts.LOG_LEVEL_CRITICAL
+        context['LOG_LEVEL_ERROR'] = consts.LOG_LEVEL_ERROR
+        context['LOG_LEVEL_WARNING'] = consts.LOG_LEVEL_WARNING
+        context['LOG_LEVEL_INFO'] = consts.LOG_LEVEL_INFO
+        context['LOG_LEVEL_DEBUG'] = consts.LOG_LEVEL_DEBUG
+        context['LOG_LEVEL_NOTSET'] = consts.LOG_LEVEL_NOTSET
 
         form = self.get_form()
         form.is_valid()
