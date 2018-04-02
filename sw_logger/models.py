@@ -1,4 +1,5 @@
 import json
+import pprint
 from typing import Optional
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -89,3 +90,25 @@ class Log(models.Model):
             return self.get_object_data_display()
 
         return tools.get_changes_display(previous_object_log, self)
+
+    def get_extra_data(self):
+        """
+        try parse json from extra-field
+        """
+        if not self.extra:
+            return
+
+        try:
+            return json.loads(self.extra)
+        except Exception:
+            pass
+
+    def get_extra_pretty(self):
+        """
+        pretty output extra-field data
+        """
+        extra_data = self.get_extra_data()
+        if not extra_data:
+            return
+
+        return pprint.pformat(extra_data)
