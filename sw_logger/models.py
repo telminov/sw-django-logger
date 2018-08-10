@@ -26,6 +26,7 @@ class Log(models.Model):
 
     object_name = models.CharField(max_length=255, db_index=True, blank=True)
     object_id = models.IntegerField(db_index=True, null=True)
+    fk_object_id = models.IntegerField(db_index=True, null=True)
     object_data = models.TextField(blank=True)
 
     extra = models.TextField(blank=True)
