@@ -3,6 +3,7 @@ import json
 from logging import Handler, LogRecord
 from django.http import QueryDict
 from django.db.models import Model
+from django.conf import settings
 
 
 class DbHandler(Handler):
@@ -61,9 +62,11 @@ class DbHandler(Handler):
 
         log.http_method = request.method
         log.http_path = request.path
-        log.http_request_get = json.dumps(cls._query_to_dict(request.GET))
-        if isinstance(request.POST, QueryDict):
-            log.http_request_post = json.dumps(cls._query_to_dict(request.POST))
+
+        if getattr(settings, 'SW_LOGGER_LOG_REQUEST_PARAMS', False):
+            log.http_request_get = json.dumps(cls._query_to_dict(request.GET))
+            if isinstance(request.POST, QueryDict):
+                log.http_request_post = json.dumps(cls._query_to_dict(request.POST))
 
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
