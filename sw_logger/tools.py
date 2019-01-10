@@ -94,8 +94,12 @@ def object_display_from_log(log: models.Log) -> Optional[dict]:
 
         if isinstance(field, ForeignKey):
             filter_params = {}
-            filter_params[field.rel.field_name] = value
-            related_qs = field.rel.to.objects.filter(**filter_params)
+            field_rel = field.rel if hasattr(field, 'rel') else field.remote_field
+            filter_params[field_rel.field_name] = value
+            if hasattr(field_rel, 'to'):
+                related_qs = field_rel.to.objects.filter(**filter_params)
+            else:
+                related_qs = field_rel.related_model.objects.filter(**filter_params)
             if len(related_qs):
                 value = related_qs[0]
 
