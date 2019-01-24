@@ -99,7 +99,7 @@ def object_display_from_log(log: models.Log) -> Optional[dict]:
             if hasattr(field_rel, 'to'):
                 related_qs = field_rel.to.objects.filter(**filter_params)
             else:
-                related_qs = field_rel.related_model.objects.filter(**filter_params)
+                related_qs = field_rel.field.related_model.objects.filter(**filter_params)
             if len(related_qs):
                 value = related_qs[0]
 
