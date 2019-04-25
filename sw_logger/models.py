@@ -113,3 +113,29 @@ class Log(models.Model):
             return
 
         return pprint.pformat(extra_data)
+
+    def get_http_request_get_pretty(self):
+        """
+        pretty output extra-field data
+        """
+        if not self.http_request_get:
+            return
+
+        request_data = json.loads(self.http_request_get)
+        if not request_data:
+            return
+
+        return pprint.pformat(request_data)
+
+    def get_http_request_post_pretty(self):
+        """
+        pretty output extra-field data
+        """
+        if not self.http_request_post:
+            return
+
+        request_data = json.loads(self.http_request_post)
+        if not request_data:
+            return
+
+        return pprint.pformat(request_data)
