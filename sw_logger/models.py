@@ -13,7 +13,7 @@ class Log(models.Model):
     action = models.CharField(max_length=10, choices=ACTION_CHOICES, default='')
     message = models.CharField(max_length=255)
     func_name = models.CharField(max_length=255)
-    level = models.CharField(max_length=10, choices=LOG_LEVEL_CHOICES, default='NOTSET')
+    level = models.CharField(max_length=10, choices=LOG_LEVEL_CHOICES, default='NOTSET', db_index=True)
 
     http_path = models.TextField(blank=True)
     http_method = models.TextField(blank=True)
@@ -30,7 +30,7 @@ class Log(models.Model):
     object_data = models.TextField(blank=True)
 
     extra = models.TextField(blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         ordering = ('id', )
