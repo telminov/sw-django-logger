@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='log',
-            name='created',
+            name='level',
             field=models.CharField(max_length=10, choices=[('', ''), ('CRITICAL', 'CRITICAL'), ('ERROR', 'ERROR'), ('WARNING', 'WARNING'), ('INFO', 'INFO'), ('DEBUG', 'DEBUG'), ('NOTSET', 'NOTSET')], default='NOTSET', db_index=True),
         ),
         migrations.AlterField(
