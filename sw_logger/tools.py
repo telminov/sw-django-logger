@@ -106,12 +106,12 @@ def object_display_from_log(log: models.Log) -> Optional[dict]:
         if isinstance(value, list):
             value = ', '.join(value)
 
-        display_data[field.verbose_name] = value
+        display_data[str(field.verbose_name)] = value
 
     for field in model._meta.many_to_many:
         value = object_data.get(field.name, [])
         related_qs = field.related_model.objects.filter(pk__in=value)
-        display_data[field.verbose_name] = ', '.join(sorted([str(i) for i in related_qs]))
+        display_data[str(field.verbose_name)] = ', '.join(sorted([str(i) for i in related_qs]))
 
     return display_data
 
