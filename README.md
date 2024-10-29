@@ -229,3 +229,14 @@ class Log(sw_logger.views.Log):
     model = models.Log
     filter_class = filters.Log
 ```
+
+Admin
+```python
+from core import models
+from django.contrib import admin
+import sw_logger.admin
+
+@admin.register(models.Log)
+class Log(sw_logger.admin.Log):
+    pass
+```
