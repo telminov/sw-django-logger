@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sw-django-logger',
-    version='0.0.18',
+    version='0.0.19',
     description='Log handling and representing for django projects',
     author='Telminov Sergey',
     author_email='sergey@telminov.ru',

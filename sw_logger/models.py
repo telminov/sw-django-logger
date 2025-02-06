@@ -75,7 +75,7 @@ class Log(models.Model):
         if not self.object_data:
             return
 
-        previous_qs = Log.objects.filter(
+        previous_qs = self._meta.model.objects.filter(
             id__lt=self.id,
             object_name=self.object_name,
             object_id=self.object_id,
